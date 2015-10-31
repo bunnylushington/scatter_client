@@ -12,10 +12,6 @@
 -define(DEFAULT_URL, "http://localhost:9911").
 -define(DEFAULT_LOGLEVEL, info).
 
-%% Sort of experimental But allows us to omit the call to start/0.
-%% (see http://www.erlang.org/doc/reference_manual/code_loading.html)
--on_load(start/0).
-
 %%====================================================================
 %% Housekeeping functions
 %%====================================================================
