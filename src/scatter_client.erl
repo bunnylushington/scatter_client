@@ -47,6 +47,7 @@ start(Options) ->
 %% @doc Query scatter for its API version.
 version() -> 
   URL = api_url("/info/version"),
+  lager:info(URL),
   ibrowse:send_req(URL, [], get).
 
 
@@ -55,4 +56,4 @@ version() ->
 %%====================================================================
 api_url(Path) -> 
   {ok, URL} = scatter_client_config:get(url),
-  URL ++ Path.
+  lists:flatten(URL ++ Path).
