@@ -45,10 +45,11 @@ start(Options) ->
 %%====================================================================
 
 %% @doc Query scatter for its API version.
+-spec version() -> jsx:json_text().
 version() -> 
   URL = api_url("/info/version"),
   lager:info(URL),
-  ibrowse:send_req(URL, [], get).
+  parse_result(ibrowse:send_req(URL, [], get)).
 
 
 %%====================================================================
@@ -57,3 +58,13 @@ version() ->
 api_url(Path) -> 
   {ok, URL} = scatter_client_config:get(url),
   lists:flatten(URL ++ Path).
+
+parse_result({ok, [$2|_]=StatusCode, Headers, Body}) ->
+  BinaryBody = list_to_binary(Body),
+  case jsx:is_json(BinaryBody) of
+    true ->  {ok,             StatusCode, jsx:decode(BinaryBody), Headers};
+    false -> {{ok, not_json}, StatusCode, Body,                   Headers}
+  end;
+parse_result({ok, StatusCode, Headers, Body}) -> 
+  {server_error, StatusCode, Body, Headers}.
+  
