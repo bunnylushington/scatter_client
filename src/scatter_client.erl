@@ -1,4 +1,6 @@
 -module('scatter_client').
+-include_lib("eunit/include/eunit.hrl").
+
 
 %% Housekeeping.
 -export([start/0, start/1]).
@@ -6,6 +8,7 @@
 %% API exports.
 -export([ 
           version/0
+        , compile/5
         ]).
 
 %% Defaults.
@@ -45,11 +48,23 @@ start(Options) ->
 %%====================================================================
 
 %% @doc Query scatter for its API version.
--spec version() -> jsx:json_text().
+-spec version() -> term().
 version() -> 
   URL = api_url("/info/version"),
-  lager:info(URL),
   parse_result(ibrowse:send_req(URL, [], get)).
+
+-spec compile(string(), string(), atom(), string(), map()) -> term().
+compile(RequestID, UserID, Language, Code, Options) -> 
+  Request = #{ user_id    => UserID,
+               language   => Language,
+               code       => Code,
+               options    => Options },
+  RequestBody = jsx:encode(Request),
+  Headers = [{accept, "application/json"}, 
+             {"content-type", "application/json"}],
+  URL = api_url("/compile/" ++ RequestID),
+  parse_result(ibrowse:send_req(URL, Headers, put, RequestBody)).
+  
 
 
 %%====================================================================
