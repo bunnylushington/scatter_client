@@ -54,9 +54,9 @@ version() ->
   parse_result(ibrowse:send_req(URL, [], get)).
 
 -spec compile(string(), string(), atom(), string(), map()) -> term().
-compile(RequestID, UserID, Language, Code, Options) -> 
+compile(RequestID, UserID, Compiler, Code, Options) -> 
   Request = #{ user_id    => UserID,
-               language   => Language,
+               compiler   => Compiler,
                code       => Code,
                options    => Options },
   RequestBody = jsx:encode(Request),
