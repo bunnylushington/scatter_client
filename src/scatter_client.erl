@@ -38,7 +38,7 @@ start(Options) ->
   URL = maps:get(url, Options, ?DEFAULT_URL),
   scatter_client_config:start(),
   scatter_client_config:set(url, URL),
-  lager:info("Communicating with server ~s", [URL]),
+  lager:debug("Communicating with server ~s", [URL]),
   %%
   application:ensure_started(ibrowse).
   
@@ -55,14 +55,16 @@ version() ->
 
 -spec compile(string(), string(), atom(), string(), map()) -> term().
 compile(RequestID, UserID, Compiler, Code, Options) -> 
-  Request = #{ user_id    => UserID,
+  Options2 = #{ source_filename => <<"Hello.java">> },
+  Request = #{ user_id    => list_to_binary(UserID),
                compiler   => Compiler,
-               code       => Code,
-               options    => Options },
+               code       => list_to_binary(Code),
+               options    => Options2 },
   RequestBody = jsx:encode(Request),
   Headers = [{accept, "application/json"}, 
              {"content-type", "application/json"}],
   URL = api_url("/compile/" ++ RequestID),
+  lager:debug("Payload: ~P~n", [RequestBody, 2048]),
   parse_result(ibrowse:send_req(URL, Headers, put, RequestBody)).
   
 
